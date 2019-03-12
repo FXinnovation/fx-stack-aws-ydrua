@@ -1,0 +1,23 @@
+{
+  "name": "aws-ydrua",
+  "version": "0.1.0",
+  "description": "ydrua - You Didn't Remove User Access, AWS Cloudformation Drift Detection System",
+  "main": "index.js",
+  "repository": "ssh://git@scm.dazzlingwrench.fxinnovation.com:2222/fxinnovation-public/lambda-aws-ydrua.git",
+  "author": "Christophe van de Kerchove <christophe.vkerchove@fxinnovation.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "async": "^2.6.2",
+    "aws-sdk": "^2.419.0",
+    "pino": "^5.11.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.15.1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0"
+  }
+}
