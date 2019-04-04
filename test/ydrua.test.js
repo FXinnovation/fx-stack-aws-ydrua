@@ -2,8 +2,8 @@ const request = require('request')
 const expect = require('chai').expect
 
 var awsMock = require('aws-sdk-mock')
-//var aws = require('aws-sdk')
-//awsMock.setSDKInstance(aws)
+// var aws = require('aws-sdk')
+// awsMock.setSDKInstance(aws)
 
 let ydrua = require('../src/lib/ydrua')
 
