@@ -24,10 +24,12 @@
     "mocha": "^6.0.2",
     "nyc": "^13.3.0",
     "request": "^2.88.0",
-    "sinon": "^7.2.7"
+    "sinon": "^7.2.7",
+    "mocha-multi-reporters": "1.1.7",
+    "mocha-junit-reporter": "1.18.0"
   },
   "scripts": {
-    "test": "nyc mocha",
+    "test": "nyc --reporter=cobertura --reporter=text mocha --reporter mocha-multi-reporters --reporter-options configFile=test-config.json",
     "lint": "eslint ./"
   }
 }
