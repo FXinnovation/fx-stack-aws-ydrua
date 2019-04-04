@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: YDRUA - Cloudformation Drift Detection System
+Parameters:
+  LogLevel: 40
+Resources:
+  detectorRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement: 
+        - Effect: Allow
+          Principal: 
+            Service: 
+            - lambda.amazonaws.com
+          Action: 
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: ydrua-detector
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - cloudformation:DetectStackResourceDrift
+            - cloudformation:DescribeStackDriftDetectionStatus
+            - cloudformation:ListStacks
+            - cloudformation:DescribeStacks
+            Resource: '*'
+      MaxSessionDuration: 300
+      RoleName: ydrua-detector
+  detector:
+    Type: AWS::Lambda::Function
+    Properties: 
+      Code:
+        S3Bucket: ''
+        S3Key: ''
+      Description: YDRUA - Detector
+      Environment:
+      FunctionName: ydrua-detector
+      Handler: detector
+      MemorySize: 256
+      ReservedConcurrentExecutions: 1
+      Role:
+        Ref: detectorRole
+      Runtime: nodejs8.10
+      Timeout: 300
+  executorRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement: 
+        - Effect: Allow
+          Principal: 
+            Service: 
+            - lambda.amazonaws.com
+          Action: 
+          - sts:AssumeRole
+      MaxSessionDuration: 300
+      Path: /
+      Policies:
+      - PolicyName: ydrua-executor
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - cloudformation:ListStacks
+            - cloudformation:DescribeStacks
+            - cloudwatch:PutMetricData
+            Resource: '*'
+      RoleName: ydrua-executor
+  executor:
+    Type: "AWS::Lambda::Function"
+    Properties: 
+      Code:
+        S3Bucket: ''
+        S3Key: ''
+      Description: YDRUA - Executor
+      Environment:
+      FunctionName: ydrua-executor
+      Handler: executor
+      MemorySize: 256
+      ReservedConcurrentExecutions: 1
+      Role:
+        Ref: executorRole
+      Runtime: nodejs8.10
+      Timeout: 300
