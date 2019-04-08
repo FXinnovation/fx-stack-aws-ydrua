@@ -1,4 +1,4 @@
-const request = require('request')
+// const request = require('request')
 const expect = require('chai').expect
 
 var awsMock = require('aws-sdk-mock')
