@@ -47,6 +47,7 @@ exports.executeDriftDetection = function (cloudformation, stackName) {
     }
   })
   logger.debug('Drift detection executed for ' + stackName)
+  return true
 }
 
 exports.sendMetrics = function (cloudwatch, stackSummary) {

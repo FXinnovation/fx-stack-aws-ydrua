@@ -1,43 +1,115 @@
-// const request = require('request')
 const expect = require('chai').expect
-
-var awsMock = require('aws-sdk-mock')
-// var aws = require('aws-sdk')
-// awsMock.setSDKInstance(aws)
 
 let ydrua = require('../src/lib/ydrua')
 
-describe('getAllStacks', function () {
-  before(function () {
-    awsMock.mock('CloudFormation', 'listStacks', function (params) {
-      return {
-        ResponseMetadata: {
-          RequestId: '5476989e-46c9-11e9-b103-5f79a6f8ac27'
-        },
-        StackSummaries: [
-          {
-            StackId: 'arn:aws:cloudformation:us-east-1:714142492823:stack/aws-cur-tam-trust/df5724f0-3e8a-11e9-a756-0a5c603a1bba',
+describe('ydrua', function () {
+  // describe('getAllStacks', function () {
+  //   it('should return a list of stacks', function () {
+  //     let params = {}
+
+  //     let cloudformation = {
+  //       listStacks: function (params) {
+  //         return []
+  //       }
+  //       .promise(function () {
+  //         return []
+  //       })
+  //     }
+
+  //     console.log(ydrua.getAllStacks(cloudformation, params))
+  //   })
+  // })
+
+  describe('executeDriftDetection', function () {
+    it('should return true on success', function () {
+      let stackName = 'exampleStack'
+      let cloudformation = {
+        detectStackDrift: function (params, callback) {
+          callback(null, 'success')
+        }
+      }
+      expect(ydrua.executeDriftDetection(cloudformation, stackName))
+        .to.equal(true)
+    })
+    it('should return true on error', function () {
+      let stackName = 'exampleStack'
+      let cloudformation = {
+        detectStackDrift: function (params, callback) {
+          let error = {
+            message: 'failed'
+          }
+          callback(error, null)
+        }
+      }
+      expect(ydrua.executeDriftDetection(cloudformation, stackName))
+        .to.equal(true)
+    })
+    it('should return true when unable to execute drift detection', function () {
+      let stackName = 'exampleStack'
+      let cloudformation = {
+        detectStackDrift: function (params, callback) {
+          let error = {
+            message: 'Drift detection is already in progress'
+          }
+          callback(error, null)
+        }
+      }
+      expect(ydrua.executeDriftDetection(cloudformation, stackName))
+        .to.equal(true)
+    })
+  })
+
+  describe('sendMetrics', function () {
+    ['IN_SYNC', 'DRIFTED', 'NOT_CHECKED', 'UNKNOWN', 'SOMETHING_ELSE'].forEach(function (driftStatus) {
+      describe('when cloudwatch works and status is ' + driftStatus, function () {
+        it('should return undefined', function () {
+          let stackSummary = {
+            StackId: 'arn:aws:cloudformation:us-east-1:714142492823:stack/aws-cur-tam-trust/df5724f0-3e8a-11e9-a75  6-0a5c603a1bba',
             StackName: 'aws-cur-tam-trust',
-            TemplateDescription: 'A role that grants readonly access to a bucket and trusts another account to assume',
+            TemplateDescription: 'A role that grants readonly access to a bucket and trusts another account to ass  ume',
             CreationTime: new Date('2019-03-04T14:36:18.553Z'),
             StackStatus: 'CREATE_COMPLETE',
             DriftInformation: {
-              StackDriftStatus: 'IN_SYNC',
+              StackDriftStatus: driftStatus,
               LastCheckTimestamp: new Date('2019-03-15T02:03:04.174Z')
             }
           }
-        ]
-      }
+
+          let cloudwatch = {
+            putMetricData: function (params, callback) {
+              callback(null, 'success')
+            }
+          }
+
+          expect(ydrua.sendMetrics(cloudwatch, stackSummary))
+            .to.equal(undefined)
+        })
+      })
+      describe('when cloudwatch fails and status is ' + driftStatus, function () {
+        it('should return undefined', function () {
+          let stackSummary = {
+            StackId: 'arn:aws:cloudformation:us-east-1:714142492823:stack/aws-cur-tam-trust/df5724f0-3e8a-11e9-a75  6-0a5c603a1bba',
+            StackName: 'aws-cur-tam-trust',
+            TemplateDescription: 'A role that grants readonly access to a bucket and trusts another account to ass  ume',
+            CreationTime: new Date('2019-03-04T14:36:18.553Z'),
+            StackStatus: 'CREATE_COMPLETE',
+            DriftInformation: {
+              StackDriftStatus: driftStatus,
+              LastCheckTimestamp: new Date('2019-03-15T02:03:04.174Z')
+            }
+          }
+
+          let cloudwatch = {
+            putMetricData: function (params, callback) {
+              let error = 'failed'
+              callback(error, null)
+            }
+          }
+
+          expect(ydrua.sendMetrics(cloudwatch, stackSummary))
+            .to.equal(undefined)
+        })
+      })
     })
-  })
-  after(function () {
-    awsMock.restore('CloudFormation')
-  })
-
-  it('should return empty table', async function () {
-    let cloudformation = awsMock.CloudFormation
-    let result = await ydrua.getAllStacks(cloudformation)
-
-    expect(result).to.eql([])
   })
 })
