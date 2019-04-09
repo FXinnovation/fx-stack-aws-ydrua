@@ -3,12 +3,11 @@ const awsRegion = process.env.AWS_REGION || 'us-east-1'
 AWS.config.update({ region: awsRegion })
 var cloudformation = new AWS.CloudFormation({ apiVersion: '2010-05-15' })
 var cloudwatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' })
+const logger = require('pino')()
+var ydrua = require('../lib/ydrua')
+logger.level = process.env.LOG_LEVEL || 'warn'
 
 exports.detector = async function (event, context) {
-  const logger = require('pino')()
-  var ydrua = require('../lib/ydrua')
-  logger.level = process.env.LOG_LEVEL || 'warn'
-
   logger.info('detector started.')
   let params = {
     StackStatusFilter: [
