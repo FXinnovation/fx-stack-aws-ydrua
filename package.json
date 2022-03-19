@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "ydrua - You Didn't Remove User Access, AWS Cloudformation Drift Detection System",
   "main": "index.js",
-  "repository": "ssh://git@scm.dazzlingwrench.fxinnovation.com:2222/fxinnovation-public/lambda-aws-ydrua.git",
+  "repository": "ssh://git@github.com:2222/FXinnovation/fx-stack-aws-ydrua.git",
   "author": "Christophe van de Kerchove <christophe.vkerchove@fxinnovation.com>",
   "license": "MIT",
   "private": false,
